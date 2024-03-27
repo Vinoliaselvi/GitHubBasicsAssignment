@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock-Paper-Scissors</title>
+    <link rel="icon" type="image/x-icon" href="images.ico">
+    <style>
+        body {
+            background-color: #282c34;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .js-title {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .design-button {
+            background-color: transparent;
+            border: 2px solid white;
+            border-radius: 50%;
+            height: 120px;
+            width: 120px;
+            margin: 0 10px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .design-img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .small-img {
+            height: 40px;
+            width: 40px;
+            object-fit: cover;
+        }
+
+        .js-result {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .moves {
+            margin-top: 10px;
+        }
+
+        .js-score {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .reset {
+            padding: 10px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background-color: #61dafb;
+            color: #282c34;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <p class="js-title">Rock-Paper-Scissors</p>
+    <button class="design-button" onclick="userMove('STONE');"><img src="images/STONE-emoji.png" class="design-img"></button>
+    <button class="design-button" onclick="userMove('PAPER');"><img src="images/PAPER-emoji.png" class="design-img"></button>
+    <button class="design-button" onclick="userMove('SCISSOR');"><img src="images/SCISSOR-emoji.png" class="design-img"></button>
+    <p class="js-result" id="result"></p>
+    <p class="moves" id="move"></p>
+    <p class="score js-score" id="score">Wins: 0 Losses: 0 Ties: 0</p>
+    <button class="reset" onclick="resetScore();">Reset Score</button>
+    <script>
+        let userMoveValue = '';
+        let score = {
+            win: 0,
+            loose: 0,
+            tie: 0
+        };
+
+        const savedScore = JSON.parse(localStorage.getItem('scores'));
+        if (savedScore) {
+            score = savedScore;
+        }
+
+        updateScore();
+
+        function calComputerMove() {
+            let cMove = '';
+            const rand = Math.random();
+            if (rand >= 0 && rand < 1 / 3)
+                cMove = 'STONE';
+            else if (rand >= 1 / 3 && rand < 2 / 3)
+                cMove = 'PAPER';
+            else
+                cMove = 'SCISSOR';
+            return cMove;
+        }
+
+        function userMove(move) {
+            userMoveValue = move;
+            calResult();
+            updateScore();
+            localStorage.setItem('scores', JSON.stringify(score));
+            const moveElement = document.querySelector('.moves');
+            moveElement.innerHTML = `You <img src="images/${userMoveValue}-emoji.png" class="small-img"> vs. <img src="images/${calComputerMove()}-emoji.png" class="small-img"> Computer`;
+        }
+
+        function calResult() {
+            const computerMove = calComputerMove();
+            const resultElement = document.querySelector('.js-result');
+            if (userMoveValue === computerMove) {
+                score.tie++;
+                resultElement.textContent = 'Tie';
+            } else if (
+                (userMoveValue === 'STONE' && computerMove === 'PAPER') ||
+                (userMoveValue === 'PAPER' && computerMove === 'SCISSOR') ||
+                (userMoveValue === 'SCISSOR' && computerMove === 'STONE')
+            ) {
+                score.loose++;
+                resultElement.textContent = 'You Loose';
+            } else {
+                score.win++;
+                resultElement.textContent = 'You Win';
+            }
+        }
+
+        function updateScore() {
+            const scoreElement = document.querySelector('.js-score');
+            scoreElement.textContent = `Wins: ${score.win} Losses: ${score.loose} Ties: ${score.tie}`;
+        }
+
+        function resetScore() {
+            score = {
+                win: 0,
+                loose: 0,
+                tie: 0
+            };
+            updateScore();
+            localStorage.removeItem('scores');
+            document.getElementById('result').textContent = '';
+        }
+    </script>
+</body>
+</html>
